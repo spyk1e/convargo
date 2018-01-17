@@ -162,46 +162,67 @@ function setPrice() {
             }
         })
 
+        
         //Distance price
         var distancePrice = priceKm * deliverie.distance
 
-
+        
         //Volume price
-
-        //Discount
-        if (deliverie.volume > 5 && deliverie.volume <= 10) {
-            priceVol *= 0.9
-        } else if (deliverie.volume > 10 && deliverie.volume <= 25) {
-            priceVol *= 0.7
-            console.log(deliverie.id)
-        } else if (deliverie.volume > 25) {
-            priceVol *= 0.5
-        }
-
+        priceVol = VolumePriceAfterDiscount(deliverie, priceVol)
 
         //Calculate price for volume
         var volumePrice = priceVol * deliverie.volume
 
 
+        
         //Calcul the total price of the shippment
         var shippingPrice = distancePrice + volumePrice
 
-
-        //Pay everyone
-        var comm = shippingPrice * 0.15 //15% of the price 
-        deliverie.commission.insurance = comm
-        deliverie.commission.treasury = parseInt(deliverie.distance / 500)
-        deliverie.commission.convargo = comm - deliverie.commission.treasury
-        
-
-
-
         //Set price in variable
         deliverie.price = shippingPrice
+        
+        //Pay everyone
+        PayEveryone(deliverie)
+
+        //Deductive 
+        Deductible()
+
+
     })
 }
 
 
+function VolumePriceAfterDiscount(deliverie, priceVol) {
+    if (deliverie.volume > 5 && deliverie.volume <= 10) {
+        priceVol *= 0.9
+    } else if (deliverie.volume > 10 && deliverie.volume <= 25) {
+        priceVol *= 0.7
+        console.log(deliverie.id)
+    } else if (deliverie.volume > 25) {
+        priceVol *= 0.5
+    }
+
+    return priceVol
+}
+
+function PayEveryone(deliverie) {
+    var comm = deliverie.price * 0.15 //15% of the price 
+    deliverie.commission.insurance = comm
+    deliverie.commission.treasury = parseInt(deliverie.distance / 500)
+    deliverie.commission.convargo = comm - deliverie.commission.treasury
+}
+
+
+function Deductible(deliverie){
+    
+}
+
+
+
+
+
+
+//Launch the function to calculate
 setPrice()
 
 
