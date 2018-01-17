@@ -150,12 +150,6 @@ const actors = [{
 //Functions
 function setPrice() {
     deliveries.forEach(function (deliverie) {
-        /*
-                distance component: the number of kilometers multiplied by the trucker price per km
-                volume component: the used volume multiplied by the trucker price per m3
-        
-                shipping price = distance + volume
-                */
 
         //Get price from the trucker
         var priceKm = 0
@@ -175,10 +169,11 @@ function setPrice() {
         //Volume price
 
         //Discount
-        if (deliverie.volume > 5 && deliverie <= 10) {
+        if (deliverie.volume > 5 && deliverie.volume <= 10) {
             priceVol *= 0.9
-        } else if (deliverie.volume > 10 && deliverie <= 25) {
+        } else if (deliverie.volume > 10 && deliverie.volume <= 25) {
             priceVol *= 0.7
+            console.log(deliverie.id)
         } else if (deliverie.volume > 25) {
             priceVol *= 0.5
         }
@@ -190,6 +185,16 @@ function setPrice() {
 
         //Calcul the total price of the shippment
         var shippingPrice = distancePrice + volumePrice
+
+
+        //Pay everyone
+        var comm = shippingPrice * 0.15 //15% of the price 
+        deliverie.commission.insurance = comm
+        deliverie.commission.treasury = parseInt(deliverie.distance / 500)
+        deliverie.commission.convargo = comm - deliverie.commission.treasury
+        
+
+
 
         //Set price in variable
         deliverie.price = shippingPrice
