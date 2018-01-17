@@ -185,9 +185,7 @@ function setPrice() {
         PayEveryone(deliverie)
 
         //Deductive 
-        Deductible()
-
-
+        Deductible(deliverie)
     })
 }
 
@@ -201,9 +199,9 @@ function VolumePriceAfterDiscount(deliverie, priceVol) {
     } else if (deliverie.volume > 25) {
         priceVol *= 0.5
     }
-
     return priceVol
 }
+
 
 function PayEveryone(deliverie) {
     var comm = deliverie.price * 0.15 //15% of the price 
@@ -214,10 +212,12 @@ function PayEveryone(deliverie) {
 
 
 function Deductible(deliverie){
-    
+    if (deliverie.options.deductibleReduction){
+        var overCharge = deliverie.volume
+        deliverie.price += overCharge
+        deliverie.commission.convargo += overCharge
+    }    
 }
-
-
 
 
 
