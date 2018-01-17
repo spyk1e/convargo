@@ -162,11 +162,11 @@ function setPrice() {
             }
         })
 
-        
+
         //Distance price
         var distancePrice = priceKm * deliverie.distance
 
-        
+
         //Volume price
         priceVol = VolumePriceAfterDiscount(deliverie, priceVol)
 
@@ -174,18 +174,22 @@ function setPrice() {
         var volumePrice = priceVol * deliverie.volume
 
 
-        
+
         //Calcul the total price of the shippment
         var shippingPrice = distancePrice + volumePrice
 
         //Set price in variable
         deliverie.price = shippingPrice
-        
+
         //Pay everyone
         PayEveryone(deliverie)
 
         //Deductive 
         Deductible(deliverie)
+
+        //Pay the actors
+        PayActors(deliverie)
+
     })
 }
 
@@ -206,20 +210,39 @@ function VolumePriceAfterDiscount(deliverie, priceVol) {
 function PayEveryone(deliverie) {
     var comm = deliverie.price * 0.15 //15% of the price 
     deliverie.commission.insurance = comm
-    deliverie.commission.treasury = parseInt(deliverie.distance / 500)
+    deliverie.commission.treasury = 1 + parseInt(deliverie.distance / 500)
     deliverie.commission.convargo = comm - deliverie.commission.treasury
 }
 
 
-function Deductible(deliverie){
-    if (deliverie.options.deductibleReduction){
+function Deductible(deliverie) {
+    if (deliverie.options.deductibleReduction) {
         var overCharge = deliverie.volume
         deliverie.price += overCharge
         deliverie.commission.convargo += overCharge
-    }    
+    }
 }
 
 
+function PayActors(deliverie) {
+    actors.forEach(function (actor) {
+        if (actor.deliveryId == deliverie.id) {
+            actor.payment.forEach(function (paymnt) {
+                if (paymnt.who == "shipper") {
+                    paymnt.amount = deliverie.price
+                } else if (paymnt.who == "trucker") {
+                    paymnt.amount = deliverie.price - (deliverie.commission.convargo + deliverie.commission.insurance + deliverie.commission.treasury)
+                } else if (paymnt.who == "insurance") {
+                    paymnt.amount = deliverie.commission.insurance
+                } else if (paymnt.who == "treasury") {
+                    paymnt.amount = deliverie.commission.treasury
+                } else if (paymnt.who == "convargo") {
+                    paymnt.amount = deliverie.commission.convargo
+                }
+            })
+        }
+    })
+}
 
 
 //Launch the function to calculate
@@ -227,9 +250,7 @@ setPrice()
 
 
 
-
-
-
+//Display things
 console.log(truckers);
 console.log(deliveries);
 console.log(actors);
