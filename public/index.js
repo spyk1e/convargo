@@ -151,11 +151,11 @@ const actors = [{
 function setPrice() {
     deliveries.forEach(function (deliverie) {
         /*
-        distance component: the number of kilometers multiplied by the trucker price per km
-        volume component: the used volume multiplied by the trucker price per m3
+                distance component: the number of kilometers multiplied by the trucker price per km
+                volume component: the used volume multiplied by the trucker price per m3
         
-        shipping price = distance + volume
-        */
+                shipping price = distance + volume
+                */
 
         //Get price from the trucker
         var priceKm = 0
@@ -164,11 +164,32 @@ function setPrice() {
             if (truck.id == deliverie.truckerId) {
                 priceKm = truck.pricePerKm
                 priceVol = truck.pricePerVolume
+                return
             }
         })
 
-        //Calcul the price of the shippment
-        var shippingPrice = deliverie.distance * priceKm + deliverie.volume * priceVol
+        //Distance price
+        var distancePrice = priceKm * deliverie.distance
+
+
+        //Volume price
+
+        //Discount
+        if (deliverie.volume > 5 && deliverie <= 10) {
+            priceVol *= 0.9
+        } else if (deliverie.volume > 10 && deliverie <= 25) {
+            priceVol *= 0.7
+        } else if (deliverie.volume > 25) {
+            priceVol *= 0.5
+        }
+
+
+        //Calculate price for volume
+        var volumePrice = priceVol * deliverie.volume
+
+
+        //Calcul the total price of the shippment
+        var shippingPrice = distancePrice + volumePrice
 
         //Set price in variable
         deliverie.price = shippingPrice
@@ -177,8 +198,6 @@ function setPrice() {
 
 
 setPrice()
-
-
 
 
 
